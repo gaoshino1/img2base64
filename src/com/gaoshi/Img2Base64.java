@@ -4,16 +4,16 @@
 
 package com.gaoshi;
 
+import java.awt.datatransfer.*;
 import java.awt.event.*;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
 import java.awt.*;
-import java.awt.datatransfer.StringSelection;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.net.URL;
 import java.util.Base64;
+import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
 
@@ -27,7 +27,7 @@ public class Img2Base64 extends JPanel {
         FlatIntelliJLaf.setup();
 
         JFrame jFrame = new JFrame();
-        jFrame.setSize(320, 170);
+        jFrame.setSize(320, 210);
         jFrame.setTitle("图片转Base64");
         jFrame.setContentPane(new Img2Base64());
         jFrame.setResizable(false);
@@ -111,6 +111,33 @@ public class Img2Base64 extends JPanel {
         System.gc();
     }
 
+    private void btnClipboardMouseClicked(MouseEvent e) {
+        // TODO add your code here
+        Clipboard sysc = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable cc = sysc.getContents(null);
+        if (cc == null) {
+            return;
+        } else if (cc.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+            try {
+                BufferedImage image = (BufferedImage) cc.getTransferData(DataFlavor.imageFlavor);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    ImageIO.write(image, "png", baos);
+                    InputStream ins = new ByteArrayInputStream(baos.toByteArray());
+                    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection("data:image/png;base64," + Base64.getEncoder().encodeToString(ins.readAllBytes())), null);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } catch (UnsupportedFlavorException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            return;
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -120,6 +147,7 @@ public class Img2Base64 extends JPanel {
         imageUrl = new JTextField();
         btnConvert = new JButton();
         btnReset = new JButton();
+        btnClipboard = new JButton();
 
         //======== this ========
         setLayout(null);
@@ -156,7 +184,7 @@ public class Img2Base64 extends JPanel {
             }
         });
         add(btnConvert);
-        btnConvert.setBounds(35, 85, 90, 40);
+        btnConvert.setBounds(35, 125, 90, 40);
 
         //---- btnReset ----
         btnReset.setText("Reset");
@@ -167,9 +195,20 @@ public class Img2Base64 extends JPanel {
             }
         });
         add(btnReset);
-        btnReset.setBounds(190, 85, 85, 40);
+        btnReset.setBounds(190, 125, 85, 40);
 
-        setPreferredSize(new Dimension(310, 135));
+        //---- btnClipboard ----
+        btnClipboard.setText("\u4ece\u526a\u8d34\u677f\u8bfb\u53d6");
+        btnClipboard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                btnClipboardMouseClicked(e);
+            }
+        });
+        add(btnClipboard);
+        btnClipboard.setBounds(60, 80, 190, 35);
+
+        setPreferredSize(new Dimension(310, 180));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -180,5 +219,6 @@ public class Img2Base64 extends JPanel {
     private JTextField imageUrl;
     private JButton btnConvert;
     private JButton btnReset;
+    private JButton btnClipboard;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

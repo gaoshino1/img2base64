@@ -47,7 +47,7 @@ new FormModel {
 				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "btnConvertMouseClicked", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 				"x": 35
-				"y": 85
+				"y": 125
 				"height": 40
 				"width": 90
 			} )
@@ -57,13 +57,23 @@ new FormModel {
 				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "btnResetMouseClicked", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 				"x": 190
-				"y": 85
+				"y": 125
 				"width": 85
 				"height": 40
 			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "btnClipboard"
+				"text": "从剪贴板读取"
+				addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "btnClipboardMouseClicked", true ) )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 60
+				"y": 80
+				"width": 190
+				"height": 35
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 310, 135 )
+			"size": new java.awt.Dimension( 310, 180 )
 		} )
 	}
 }
