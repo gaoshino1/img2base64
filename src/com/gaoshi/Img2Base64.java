@@ -27,7 +27,7 @@ public class Img2Base64 extends JPanel {
         FlatIntelliJLaf.setup();
 
         JFrame jFrame = new JFrame();
-        jFrame.setSize(320, 210);
+        jFrame.setSize(320, 300);
         jFrame.setTitle("图片转Base64");
         jFrame.setContentPane(new Img2Base64());
         jFrame.setResizable(false);
@@ -119,12 +119,16 @@ public class Img2Base64 extends JPanel {
             return;
         } else if (cc.isDataFlavorSupported(DataFlavor.imageFlavor)) {
             try {
+                // this statement can output base64
+                // System.out.println(Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null).getTransferData(DataFlavor.stringFlavor));
+                // below is another way
                 BufferedImage image = (BufferedImage) cc.getTransferData(DataFlavor.imageFlavor);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     ImageIO.write(image, "png", baos);
                     InputStream ins = new ByteArrayInputStream(baos.toByteArray());
                     Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection("data:image/png;base64," + Base64.getEncoder().encodeToString(ins.readAllBytes())), null);
+                    JOptionPane.showMessageDialog(null, "base64已复制到剪贴板", "提示", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -138,6 +142,58 @@ public class Img2Base64 extends JPanel {
         }
     }
 
+    private void btnClipboard1MouseClicked(MouseEvent e) {
+        // TODO add your code here
+        try {
+            String base64 = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null).getTransferData(DataFlavor.stringFlavor);
+            String imageDataBytes = base64.substring(base64.indexOf(",") + 1);
+            InputStream stream = new ByteArrayInputStream(Base64.getDecoder().decode(imageDataBytes.getBytes()));
+            Image image = ImageIO.read(stream);
+            ImageTransferable imageTransferable = new ImageTransferable(image);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(imageTransferable, null);
+            JOptionPane.showMessageDialog(null, "图像已复制到剪贴板", "提示", JOptionPane.INFORMATION_MESSAGE);
+        } catch (UnsupportedFlavorException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
+
+    //copied from https://stackoverflow.com/questions/7834768/setting-images-to-clipboard-java
+    static class ImageTransferable implements Transferable
+    {
+        private Image image;
+
+        public ImageTransferable (Image image)
+        {
+            this.image = image;
+        }
+
+        public Object getTransferData(DataFlavor flavor)
+                throws UnsupportedFlavorException
+        {
+            if (isDataFlavorSupported(flavor))
+            {
+                return image;
+            }
+            else
+            {
+                throw new UnsupportedFlavorException(flavor);
+            }
+        }
+
+        public boolean isDataFlavorSupported (DataFlavor flavor)
+        {
+            return flavor == DataFlavor.imageFlavor;
+        }
+
+        public DataFlavor[] getTransferDataFlavors ()
+        {
+            return new DataFlavor[] { DataFlavor.imageFlavor };
+        }
+    }
+
 
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
@@ -148,6 +204,9 @@ public class Img2Base64 extends JPanel {
         btnConvert = new JButton();
         btnReset = new JButton();
         btnClipboard = new JButton();
+        separator1 = new JSeparator();
+        separator2 = new JSeparator();
+        btnClipboard1 = new JButton();
 
         //======== this ========
         setLayout(null);
@@ -184,7 +243,7 @@ public class Img2Base64 extends JPanel {
             }
         });
         add(btnConvert);
-        btnConvert.setBounds(35, 125, 90, 40);
+        btnConvert.setBounds(35, 80, 90, 40);
 
         //---- btnReset ----
         btnReset.setText("Reset");
@@ -195,10 +254,10 @@ public class Img2Base64 extends JPanel {
             }
         });
         add(btnReset);
-        btnReset.setBounds(190, 125, 85, 40);
+        btnReset.setBounds(190, 80, 85, 40);
 
         //---- btnClipboard ----
-        btnClipboard.setText("\u4ece\u526a\u8d34\u677f\u8bfb\u53d6");
+        btnClipboard.setText("\u4ece\u526a\u8d34\u677f\u8bfb\u53d6\u56fe\u50cf\u8f6cbase64");
         btnClipboard.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -206,9 +265,25 @@ public class Img2Base64 extends JPanel {
             }
         });
         add(btnClipboard);
-        btnClipboard.setBounds(60, 80, 190, 35);
+        btnClipboard.setBounds(60, 145, 190, 35);
+        add(separator1);
+        separator1.setBounds(70, 130, 160, 33);
+        add(separator2);
+        separator2.setBounds(10, 195, 295, 10);
 
-        setPreferredSize(new Dimension(310, 180));
+        //---- btnClipboard1 ----
+        btnClipboard1.setText("\u4ece\u526a\u8d34\u677f\u8bfb\u53d6base64\u8f6c\u56fe\u50cf");
+        btnClipboard1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                btnClipboardMouseClicked(e);
+                btnClipboard1MouseClicked(e);
+            }
+        });
+        add(btnClipboard1);
+        btnClipboard1.setBounds(60, 210, 190, 35);
+
+        setPreferredSize(new Dimension(310, 265));
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
     }
 
@@ -220,5 +295,8 @@ public class Img2Base64 extends JPanel {
     private JButton btnConvert;
     private JButton btnReset;
     private JButton btnClipboard;
+    private JSeparator separator1;
+    private JSeparator separator2;
+    private JButton btnClipboard1;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
