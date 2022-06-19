@@ -4,18 +4,19 @@
 
 package com.gaoshi;
 
-import java.awt.datatransfer.*;
-import java.awt.event.*;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 
+import javax.imageio.ImageIO;
+import javax.net.ssl.HttpsURLConnection;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.util.Base64;
-import javax.imageio.ImageIO;
-import javax.net.ssl.HttpsURLConnection;
-import javax.swing.*;
 
 /**
  * @author Gaoshi_nol
@@ -96,7 +97,7 @@ public class Img2Base64 extends JPanel {
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5000);
                 connection.connect();
-                base64 = "data:image/" + imageUrl.substring(imageUrl.lastIndexOf(".") + 1) + ";base64," + Base64.getEncoder().encodeToString(connection.getInputStream().readAllBytes());;
+                base64 = "data:image/" + imageUrl.substring(imageUrl.lastIndexOf(".") + 1) + ";base64," + Base64.getEncoder().encodeToString(connection.getInputStream().readAllBytes());
                 connection.disconnect();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -161,36 +162,28 @@ public class Img2Base64 extends JPanel {
     }
 
     //copied from https://stackoverflow.com/questions/7834768/setting-images-to-clipboard-java
-    static class ImageTransferable implements Transferable
-    {
-        private Image image;
+    static class ImageTransferable implements Transferable {
+        private final Image image;
 
-        public ImageTransferable (Image image)
-        {
+        public ImageTransferable(Image image) {
             this.image = image;
         }
 
         public Object getTransferData(DataFlavor flavor)
-                throws UnsupportedFlavorException
-        {
-            if (isDataFlavorSupported(flavor))
-            {
+                throws UnsupportedFlavorException {
+            if (isDataFlavorSupported(flavor)) {
                 return image;
-            }
-            else
-            {
+            } else {
                 throw new UnsupportedFlavorException(flavor);
             }
         }
 
-        public boolean isDataFlavorSupported (DataFlavor flavor)
-        {
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
             return flavor == DataFlavor.imageFlavor;
         }
 
-        public DataFlavor[] getTransferDataFlavors ()
-        {
-            return new DataFlavor[] { DataFlavor.imageFlavor };
+        public DataFlavor[] getTransferDataFlavors() {
+            return new DataFlavor[]{DataFlavor.imageFlavor};
         }
     }
 
